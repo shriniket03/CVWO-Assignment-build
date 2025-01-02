@@ -18,7 +18,6 @@ func GetRoutes() func(r chi.Router) {
 				w.Header().Set("Content-Type", "application/json")
 				json.NewEncoder(w).Encode(response)
 			}
-
 		})
 
 		r.Post("/users", func(w http.ResponseWriter, req *http.Request) {
@@ -36,7 +35,7 @@ func GetRoutes() func(r chi.Router) {
 
 		r.Post("/login", func(w http.ResponseWriter, req *http.Request) {
 			response, err := users.LoginUser(w, req)
-			if (err.Error() == `Unauthorized`) || (err.Error() == `invalid username`)  {
+			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
 				w.Write([]byte("401 - Unauthorized! Invalid Username/Password"))
 			} else {
@@ -76,7 +75,11 @@ func GetRoutes() func(r chi.Router) {
 		r.Delete("/posts/{id}", func(w http.ResponseWriter, req *http.Request) {
 			response, err := users.DeletePost(w,req,chi.URLParam(req, "id"))
 			if err != nil {
-				w.WriteHeader(http.StatusBadRequest)
+				if err.Error() == `Unauthorized` {
+					w.WriteHeader(http.StatusUnauthorized)
+				} else {
+					w.WriteHeader(http.StatusBadRequest)
+				}
 				w.Write([]byte(err.Error()))
 			} else {
 				w.WriteHeader(http.StatusNoContent)
@@ -99,7 +102,26 @@ func GetRoutes() func(r chi.Router) {
 		r.Patch("/posts/{id}", func(w http.ResponseWriter, req *http.Request) {
 			response, err := users.UpdatePost(w,req,chi.URLParam(req,"id"))
 			if err != nil {
-				w.WriteHeader(http.StatusBadRequest)
+				if err.Error() != `Unauthorized` {
+					w.WriteHeader(http.StatusBadRequest)
+				} else {
+					w.WriteHeader(http.StatusUnauthorized)
+				}
+				w.Write([]byte(err.Error()))
+			} else {
+				w.Header().Set("Content-Type", "application/json")
+				json.NewEncoder(w).Encode(response)
+			}
+		})
+
+		r.Patch("/likepost/{id}", func(w http.ResponseWriter, req *http.Request) {
+			response, err := users.LikePost(w,req,chi.URLParam(req,"id"))
+			if err != nil {
+				if err.Error() != `Unauthorized` {
+					w.WriteHeader(http.StatusBadRequest)
+				} else {
+					w.WriteHeader(http.StatusUnauthorized)
+				}
 				w.Write([]byte(err.Error()))
 			} else {
 				w.Header().Set("Content-Type", "application/json")
@@ -144,7 +166,11 @@ func GetRoutes() func(r chi.Router) {
 			// Delete
 			response, err := users.DeleteComment(w,req,chi.URLParam(req, "id"))
 			if err != nil {
-				w.WriteHeader(http.StatusBadRequest)
+				if err.Error() == `Unauthorized` {
+					w.WriteHeader(http.StatusUnauthorized)
+				} else {
+					w.WriteHeader(http.StatusBadRequest)
+				}
 				w.Write([]byte(err.Error()))
 			} else {
 				w.WriteHeader(http.StatusNoContent)

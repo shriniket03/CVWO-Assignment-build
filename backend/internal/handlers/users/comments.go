@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"github.com/shriniket03/CRUD/backend/internal/models"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -95,7 +96,17 @@ func CreateComment(w http.ResponseWriter, r *http.Request) (*api.Response, error
 		return nil, errors.New(string(b))	
 	}
 
-	comment, err := users.AddComment(db,inp)
+	reqToken := r.Header.Get("Authorization")
+	splitToken := strings.Split(reqToken, "Bearer ")
+	reqToken = splitToken[1]
+
+	userID , err := verifyToken(reqToken)
+
+	if err != nil {
+		return nil, errors.New(`Unauthorized`)
+	}
+
+	comment, err := users.AddComment(db,inp,userID)
 	if err != nil {
 		return nil, errors.New(`Unable to Add Comment to DB`)
 	}
@@ -118,14 +129,23 @@ func DeleteComment(w http.ResponseWriter, req *http.Request, inp string) (*api.R
 	}
 
 	i, err := strconv.Atoi(inp)
-
 	if err != nil {
 		return nil, errors.New(`Error converting parameter to integer`)
 	}
 
-	_, err = users.CommentDeleter(db, i)
+	reqToken := req.Header.Get("Authorization")
+	splitToken := strings.Split(reqToken, "Bearer ")
+	reqToken = splitToken[1]
+
+	userID , err := verifyToken(reqToken)
+
 	if err != nil {
-		return nil, errors.New(`Error Deleting Comment from DB`)
+		return nil, errors.New(`Unauthorized`)
+	}
+
+	_, err = users.CommentDeleter(db, i, userID)
+	if err != nil {
+		return nil, err
 	}
 
 	data, _ := json.Marshal("")

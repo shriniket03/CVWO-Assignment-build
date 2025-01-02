@@ -5,6 +5,8 @@ import (
 	"github.com/shriniket03/CRUD/backend/internal/models"
 	"golang.org/x/crypto/bcrypt"
 	"github.com/golang-jwt/jwt/v5"
+	 "time"
+	 "errors"
 )
 
 func GetUsers(db *database.Database) ([]models.User, error) {
@@ -50,35 +52,36 @@ func AddUser(db *database.Database, details models.UserInput) (models.User, erro
 	return models.User{ID: lastInsertId, Username: details.Username, Password: hashText, Name:details.Name}, nil
 }
 
-func LoginAction (db *database.Database, params models.Login) (string, string) {
+func LoginAction (db *database.Database, params models.Login) (string, error) {
 	app := db.Ref
 	userInp := params.Username
 	passInp := params.Password
 	var a int
 	var b,c string 
+
 	err := app.QueryRow(`SELECT id,username,password FROM Users WHERE username = $1`,userInp).Scan(&a,&c,&b)
 
 	if err!= nil {
-		return "", "invalid username"
+		return "", errors.New("invalid username")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(b), []byte(passInp))
 
 	if err!=nil {
-		return "", "Unauthorized"
+		return "", errors.New("Unauthorized")
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, 
         jwt.MapClaims{ 
         "username": string(c), 
         "id": a, 
+		"exp": time.Now().Add(time.Hour * 1).Unix(), 
         })
-	tokenString, err := token.SignedString([]byte(database.GoDotEnvVariable("SECRET")))
 
+	tokenString, err := token.SignedString([]byte(database.GoDotEnvVariable("SECRET")))
     if err != nil {
-		return "", "unable to generate token"
+		return "", errors.New("unable to generate token")
     }
 
-	return tokenString, ""
-
+	return tokenString, nil
 }

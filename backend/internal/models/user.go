@@ -34,6 +34,7 @@ type Post struct {
 	Likes int
 	Tag string
 	Content string
+	Time int
 }
 
 type PostInfo struct {
@@ -43,12 +44,7 @@ type PostInfo struct {
 	Likes int
 	Tag string
 	Content string
-}
-
-type PostChange struct {
-	Likes int 
-	Tag string
-	Content string
+	Time int 
 }
 
 type Comment struct {
@@ -57,12 +53,12 @@ type Comment struct {
 	Post int 
 	AuthUsername string 
 	AuthName string
+	Time int
 }
 
 type CommentInput struct {
 	Content string
 	Post int 
-	Author int  
 }
 
 func (u UserInput) Validate() error {
@@ -80,16 +76,16 @@ func (u PostInput) Validate() error {
 	)
 }
 
-func (u CommentInput) Validate() error {
+func (u Login) Validate() error {
 	return validation.ValidateStruct(&u,
-		validation.Field(&u.Content, validation.Required, validation.Length(1, 0)),
+		validation.Field(&u.Username, validation.Required, validation.Length(5, 50)),
+		validation.Field(&u.Password, validation.Required, validation.Length(5, 50)),
 	)
 }
 
-func (u PostChange) Validate() error {
+func (u CommentInput) Validate() error {
 	return validation.ValidateStruct(&u,
-		validation.Field(&u.Tag, validation.Required, validation.Length(5, 50)),
-		validation.Field(&u.Content, validation.Required, validation.Length(5, 0)),
+		validation.Field(&u.Content, validation.Required, validation.Length(1, 0)),
 	)
 }
 

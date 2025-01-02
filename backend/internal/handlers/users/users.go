@@ -1,7 +1,6 @@
 package users
 
 import (
-	// "fmt"
 	"encoding/json"
 	"net/http"
 	"github.com/shriniket03/CRUD/backend/internal/api"
@@ -61,12 +60,18 @@ func LoginUser(w http.ResponseWriter, r *http.Request) (*api.Response, error) {
 		return nil, errors.New(ErrDecodeRequestMsg)
 	}
 
+	err = inp.Validate()
+
+	if err != nil {
+		return nil, errors.New(`Invalid Username/Password`)
+	}
+
 	tokenstr, msg := users.LoginAction(db,inp)
-	
+
 	data, err := json.Marshal(tokenstr)
 
 	if tokenstr == "" {
-		return nil, errors.New(msg)
+		return nil, msg
 	}
 
 	return &api.Response{

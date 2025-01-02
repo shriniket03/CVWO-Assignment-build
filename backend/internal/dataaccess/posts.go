@@ -3,32 +3,29 @@ package users
 import (
 	"github.com/shriniket03/CRUD/backend/internal/database"
 	"github.com/shriniket03/CRUD/backend/internal/models"
+	"time"
+	"errors"
 )
 
-func InsertPost (db *database.Database, details models.PostInput, userID string) (models.Post, error) {
+func InsertPost (db *database.Database, details models.PostInput, userID int) (models.Post, error) {
 	app := db.Ref
 	tagInp := details.Tag
 	contentInp := details.Content
+	time := time.Now().Unix()
 
 	lastInsertId := 0
-	intUserID := 0 
-	err := app.QueryRow(`SELECT id FROM Users WHERE username = $1`, userID).Scan(&intUserID)
-	if err != nil {
-		return models.Post{}, err
-	}
-
-	err = app.QueryRow(`INSERT INTO Posts (author,likes,tag,content) VALUES ($1,0,$2,$3) RETURNING ID`, intUserID, tagInp, contentInp).Scan(&lastInsertId)
+	err := app.QueryRow(`INSERT INTO Posts (author,likes,tag,content,time) VALUES ($1,0,$2,$3,$4) RETURNING ID`, userID, tagInp, contentInp,time).Scan(&lastInsertId)
 
 	if err != nil {
 		return models.Post{}, err
 	}
 
-	return models.Post{ID: lastInsertId, Author: intUserID, Likes: 0, Tag:tagInp, Content: contentInp}, nil
+	return models.Post{ID: lastInsertId, Author: userID, Likes: 0, Tag:tagInp, Content: contentInp, Time:int(time)}, nil
 }
 
 func GetPosts(db *database.Database) ([]models.PostInfo, error) {
 	app := db.Ref
-	rows, err := app.Query("SELECT Posts.id,name,username,likes,tag,content FROM Posts INNER JOIN Users ON Posts.author = Users.id")
+	rows, err := app.Query("SELECT Posts.id,name,username,likes,tag,content,time FROM Posts INNER JOIN Users ON Posts.author = Users.id")
 	if err != nil {
 		return []models.PostInfo{},err
 	}
@@ -37,15 +34,15 @@ func GetPosts(db *database.Database) ([]models.PostInfo, error) {
 
 	for rows.Next() {
 		var name,username,tag,content string
-		var id,likes int
+		var id,likes,time int
 
-		err = rows.Scan(&id,&name,&username,&likes,&tag,&content)
+		err = rows.Scan(&id,&name,&username,&likes,&tag,&content,&time)
 		
 		if err != nil {
 			return []models.PostInfo{},err
 		}
 
-		posts = append(posts,models.PostInfo{ID:int(id),AuthName:name,AuthUsername:username,Likes:likes,Tag:tag,Content:content})
+		posts = append(posts,models.PostInfo{ID:int(id),AuthName:name,AuthUsername:username,Likes:likes,Tag:tag,Content:content,Time:time})
 	}
 
 	return posts, nil
@@ -53,53 +50,98 @@ func GetPosts(db *database.Database) ([]models.PostInfo, error) {
 
 func GetSinglePost(db *database.Database, inp int) (models.PostInfo, error) {
 	app := db.Ref 
-	row := app.QueryRow("SELECT Posts.id,name,username,likes,tag,content FROM Posts INNER JOIN Users ON Posts.author = Users.id WHERE Posts.id = $1", inp)
+	row := app.QueryRow("SELECT Posts.id,name,username,likes,tag,content,time FROM Posts INNER JOIN Users ON Posts.author = Users.id WHERE Posts.id = $1", inp)
 
 	var name,username,tag,content string
-	var id,likes int
+	var id,likes,time int
 
-	err := row.Scan(&id,&name,&username,&likes,&tag,&content)
+	err := row.Scan(&id,&name,&username,&likes,&tag,&content,&time)
 
 	if err != nil {
 		return models.PostInfo{}, err
 	}
 
-	return models.PostInfo{ID: int(id), AuthName: name, AuthUsername:username, Likes:likes, Tag:tag,Content:content}, nil
+	return models.PostInfo{ID: int(id), AuthName: name, AuthUsername:username, Likes:likes, Tag:tag,Content:content,Time:time}, nil
 }
 
-func PostDeleter(db *database.Database, inp int) (string, error) {
+func PostDeleter(db *database.Database, inp int, userID int) (string, error) {
 	app := db.Ref
-	_, err := app.Exec("DELETE FROM Posts WHERE id = $1", inp)
+	row := app.QueryRow("SELECT author FROM Posts WHERE id = $1", inp)
+	var actID int
+	err := row.Scan(&actID)
+	if err != nil {
+		return "", errors.New(`Unable to extract post`)
+	}
+	if actID != userID {
+		return "", errors.New(`Unauthorized`)
+	}
+	_, err = app.Exec("DELETE FROM Posts WHERE id = $1", inp)
 
 	if err!= nil {
-		return "", err
+		return "", errors.New(`Unable to delete post`)
 	}
 
 	return "",nil
 }
 
-func PostUpdater (db *database.Database, details models.PostChange, inp int) (models.PostInfo, error) {
+func ModifyPostLikes (db *database.Database, inp int) (models.PostInfo, error) {
+	app := db.Ref
+	row := app.QueryRow("SELECT likes FROM Posts WHERE id = $1", inp)
+	var befLikes int 
+	err := row.Scan(&befLikes)
+	if err != nil {
+		return models.PostInfo{}, errors.New(`Unable to extract post`)
+	}
+	_, err = app.Exec("UPDATE Posts SET likes = $1 WHERE id = $2", befLikes+1,inp)
+	if err != nil {
+		return models.PostInfo{}, errors.New(`Unable to Update in DB`)
+	}
+
+	row = app.QueryRow("SELECT Posts.id,name,username,likes,tag,content,time FROM Posts INNER JOIN Users ON Posts.author = Users.id WHERE Posts.id = $1", inp)
+
+	var name,username,tag,content string
+	var id,likes,time int
+
+	err = row.Scan(&id,&name,&username,&likes,&tag,&content,&time)
+
+	if err != nil {
+		return models.PostInfo{}, errors.New(`Unable to get Post Info`)
+	}
+	return models.PostInfo{ID: int(id), AuthName: name, AuthUsername:username, Likes:likes, Tag:tag,Content:content,Time:time}, nil
+}
+
+
+func PostUpdater (db *database.Database, details models.PostInput, inp int, userID int) (models.PostInfo, error) {
 	app := db.Ref 
-	likesUpdate := details.Likes
 	contentUpdate := details.Content
 	tagUpdate := details.Tag
 
-	_, err := app.Exec("UPDATE Posts SET likes = $1, content = $2, tag = $3 WHERE id = $4", likesUpdate,contentUpdate,tagUpdate,inp)
-
+	row := app.QueryRow("SELECT author FROM Posts WHERE id = $1", inp)
+	var actID int
+	err := row.Scan(&actID)
 	if err != nil {
-		return models.PostInfo{}, err
+		return models.PostInfo{}, errors.New(`Unable to extract post`)
+	}
+	if actID != userID {
+		return models.PostInfo{}, errors.New(`Unauthorized`)
 	}
 
-	row := app.QueryRow("SELECT Posts.id,name,username,likes,tag,content FROM Posts INNER JOIN Users ON Posts.author = Users.id WHERE Posts.id = $1", inp)
+	_, err = app.Exec("UPDATE Posts SET content = $1, tag = $2 WHERE id = $3", contentUpdate,tagUpdate,inp)
+
+	if err != nil {
+		return models.PostInfo{}, errors.New(`Unable to Update in DB`)
+	}
+
+	row = app.QueryRow("SELECT Posts.id,name,username,likes,tag,content,time FROM Posts INNER JOIN Users ON Posts.author = Users.id WHERE Posts.id = $1", inp)
 
 	var name,username,tag,content string
-	var id,likes int
+	var id,likes,time int
 
-	err = row.Scan(&id,&name,&username,&likes,&tag,&content)
+	err = row.Scan(&id,&name,&username,&likes,&tag,&content,&time)
 
 	if err != nil {
-		return models.PostInfo{}, err
+		return models.PostInfo{}, errors.New(`Unable to get Post Info`)
 	}
 
-	return models.PostInfo{ID: int(id), AuthName: name, AuthUsername:username, Likes:likes, Tag:tag,Content:content}, nil
+	return models.PostInfo{ID: int(id), AuthName: name, AuthUsername:username, Likes:likes, Tag:tag,Content:content,Time:time}, nil
 }

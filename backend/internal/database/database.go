@@ -43,41 +43,43 @@ func GetDB() (*Database, error) {
 }
 
 func createTables (db *sql.DB) {
-	query := `CREATE TABLE IF NOT EXISTS Comments (
-	id SERIAL PRIMARY KEY,
-	author INT, 
-	post INT, 
-	content TEXT NOT NULL, 
-	CONSTRAINT fk_Author FOREIGN KEY(author) REFERENCES Users(id),
-	CONSTRAINT fk_Post FOREIGN KEY(post) REFERENCES Posts(id)
-	)`
+	// query := `CREATE TABLE IF NOT EXISTS Comments (
+	// id SERIAL PRIMARY KEY,
+	// author INT, 
+	// post INT, 
+	// content TEXT NOT NULL, 
+	// CONSTRAINT fk_Author FOREIGN KEY(author) REFERENCES Users(id),
+	// CONSTRAINT fk_Post FOREIGN KEY(post) REFERENCES Posts(id)
+	// )`
+	// query := `ALTER TABLE Posts
+	// ADD time bigint`
+	// _, err:= db.Exec(query)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// _, err := db.Exec("DELETE FROM Posts")
+	// _, err = db.Exec("DELETE FROM Comments")
+	// _,err = db.Exec("INSERT INTO Comments (author,post,content,time) VALUES (24,49, 'Good job good one',1000)")
 
-	_, err:= db.Exec(query)
-	if err != nil {
-		panic(err)
-	}
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	_,err = db.Exec("INSERT INTO Comments (author,post,content) VALUES (24,49, 'Good job good one')")
+	// rows, err := db.Query("SELECT * FROM Comments")
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	if err != nil {
-		panic(err)
-	}
+	// for rows.Next() {
+	// 	var id, auth, post,time int
+	// 	var content string
+	// 	err = rows.Scan(&id, &auth, &post, &content, &time)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
 
-	rows, err := db.Query("SELECT * FROM Comments")
-	if err != nil {
-		panic(err)
-	}
-
-	for rows.Next() {
-		var id, auth, post int
-		var content string
-		err = rows.Scan(&id, &auth, &post, &content)
-		if err != nil {
-			panic(err)
-		}
-
-		fmt.Println(id,auth,post,content)
-	}
+	// 	fmt.Println(id,auth,post,content,time)
+	// }
 
 
 }
