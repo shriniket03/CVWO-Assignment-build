@@ -12,6 +12,11 @@ type User struct {
 	Password string `json:"password"`
 }
 
+type UserToken struct {
+	Username string 
+	Token string
+}
+
 type UserInput struct {
 	Name string
 	Username string

@@ -7,7 +7,7 @@ import (
 	"errors"
 )
 
-func InsertPost (db *database.Database, details models.PostInput, userID int) (models.Post, error) {
+func InsertPost (db *database.Database, details models.PostInput, userID int) (models.PostInfo, error) {
 	app := db.Ref
 	tagInp := details.Tag
 	contentInp := details.Content
@@ -17,10 +17,21 @@ func InsertPost (db *database.Database, details models.PostInput, userID int) (m
 	err := app.QueryRow(`INSERT INTO Posts (author,likes,tag,content,time) VALUES ($1,0,$2,$3,$4) RETURNING ID`, userID, tagInp, contentInp,time).Scan(&lastInsertId)
 
 	if err != nil {
-		return models.Post{}, err
+		return models.PostInfo{}, err
 	}
 
-	return models.Post{ID: lastInsertId, Author: userID, Likes: 0, Tag:tagInp, Content: contentInp, Time:int(time)}, nil
+	row := app.QueryRow("SELECT Posts.id,name,username,likes,tag,content,time FROM Posts INNER JOIN Users ON Posts.author = Users.id WHERE Posts.id = $1", lastInsertId)
+
+	var name,username,tag,content string
+	var id,likes,times int
+
+	err = row.Scan(&id,&name,&username,&likes,&tag,&content,&times)
+
+	if err != nil {
+		return models.PostInfo{}, errors.New(`Unable to get Post Info`)
+	}
+
+	return models.PostInfo{ID: int(id), AuthName: name, AuthUsername:username, Likes:likes, Tag:tag,Content:content,Time:times}, nil
 }
 
 func GetPosts(db *database.Database) ([]models.PostInfo, error) {
@@ -70,12 +81,13 @@ func PostDeleter(db *database.Database, inp int, userID int) (string, error) {
 	var actID int
 	err := row.Scan(&actID)
 	if err != nil {
-		return "", errors.New(`Unable to extract post`)
+		return "", errors.New(`Post does not exist`)
 	}
 	if actID != userID {
 		return "", errors.New(`Unauthorized`)
 	}
 	_, err = app.Exec("DELETE FROM Posts WHERE id = $1", inp)
+	_, err = app.Exec("DELETE FROM Comments WHERE post = $1", inp)
 
 	if err!= nil {
 		return "", errors.New(`Unable to delete post`)
@@ -117,7 +129,7 @@ func PostUpdater (db *database.Database, details models.PostInput, inp int, user
 	tagUpdate := details.Tag
 
 	row := app.QueryRow("SELECT author FROM Posts WHERE id = $1", inp)
-	var actID int
+	var actID int 
 	err := row.Scan(&actID)
 	if err != nil {
 		return models.PostInfo{}, errors.New(`Unable to extract post`)

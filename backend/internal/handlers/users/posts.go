@@ -19,11 +19,11 @@ import (
 const (
 	CreatePostMsg = "posts.CreatePost"
 	GettingPosts = "posts.GetPosts"
-	ErrRetrieveDatabaseMsg        = "Failed to retrieve database in %s"
+	ErrRetrieveDatabaseMsg        = "Failed to retrieve database"
 	ErrDecodeRequestMsg = "Error Decoding Request"
 	SuccessfullyAddedMsg = "Successfully Added Post"
 	ErrRetrievePostsMsg = "Error Retrieving Posts"
-	ErrEncodeViewMsg              = "Failed to retrieve users in %s"
+	ErrEncodeViewMsg              = "Failed to retrieve users"
 	SuccessfulListPosts = "Successfully Listed All Posts"
 	SuccessfulyDeletedPost = "Successfully Deleted Post"
 	SuccessFetchPost = "Successfully Fetched Post"
@@ -53,6 +53,11 @@ func CreatePost(w http.ResponseWriter, r *http.Request) (*api.Response, error) {
 
 	reqToken := r.Header.Get("Authorization")
 	splitToken := strings.Split(reqToken, "Bearer ")
+
+	if len(splitToken) != 2 {
+		return nil, errors.New(`Unauthorized`)
+	}
+	
 	reqToken = splitToken[1]
 
 	userID , err := verifyToken(reqToken)
