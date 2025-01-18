@@ -4,27 +4,26 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"net/url"
 )
 
-func GoDotEnvVariable(key string) string {
-	// load .env file
-	err := godotenv.Load("../../.env")
-	if err != nil {
-	  log.Fatalf("Error loading .env file")
-	}
-	return os.Getenv(key)
-}
+// func GoDotEnvVariable(key string) string {
+// 	// load .env file
+// 	err := godotenv.Load("../../.env")
+// 	if err != nil {
+// 	  log.Fatalf("Error loading .env file")
+// 	}
+// 	return os.Getenv(key)
+// }
 
 type Database struct {
 	Ref *sql.DB
 }
 
 func GetDB() (*Database, error) {
-	psqlInfo := GoDotEnvVariable("DATABASE_URI")
+	psqlInfo := os.Getenv("DATABASE_URI")
 	conn, _ := url.Parse(psqlInfo)
 	conn.RawQuery = "sslmode=verify-ca;sslrootcert=ca.pem"
 

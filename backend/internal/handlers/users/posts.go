@@ -267,7 +267,7 @@ func UpdatePost(w http.ResponseWriter, r*http.Request, txt string) (*api.Respons
 
 func verifyToken(tokenString string) (int,error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-	   return []byte(database.GoDotEnvVariable("SECRET")), nil
+	   return []byte(os.Getenv("SECRET")), nil
 	})
 
 	if err != nil {

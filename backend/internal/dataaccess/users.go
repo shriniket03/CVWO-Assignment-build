@@ -78,7 +78,7 @@ func LoginAction (db *database.Database, params models.Login) (string, error) {
 		"exp": time.Now().Add(time.Hour * 1).Unix(), 
         })
 
-	tokenString, err := token.SignedString([]byte(database.GoDotEnvVariable("SECRET")))
+	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
     if err != nil {
 		return "", errors.New("unable to generate token")
     }
