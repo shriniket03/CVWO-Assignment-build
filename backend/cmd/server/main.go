@@ -6,13 +6,14 @@ import (
 	"net/http"
 	"github.com/shriniket03/CRUD/backend/internal/router"
 	"github.com/joho/godotenv"
+	"os"
 )
 
 func main() {
 	r := router.Setup()
 	port := GoDotEnvVariable("PORT")
 	fmt.Print("Listening on port 8000 at http://localhost:8000!")
-	log.Fatalln(http.ListenAndServe(":8000", r))
+	log.Fatalln(http.ListenAndServe(":"+port, r))
 }
 
 func GoDotEnvVariable(key string) string {
@@ -22,8 +23,4 @@ func GoDotEnvVariable(key string) string {
 	  log.Fatalf("Error loading .env file")
 	}
 	return os.Getenv(key)
-}
-
-type Database struct {
-	Ref *sql.DB
 }
