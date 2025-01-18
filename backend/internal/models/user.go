@@ -76,7 +76,7 @@ func (u UserInput) Validate() error {
 
 func (u PostInput) Validate() error {
 	return validation.ValidateStruct(&u,
-		validation.Field(&u.Tag, validation.Required, validation.Length(5, 50)),
+		validation.Field(&u.Tag, validation.Required, validation.Length(5, 0)),
 		validation.Field(&u.Content, validation.Required, validation.Length(5, 0)),
 	)
 }

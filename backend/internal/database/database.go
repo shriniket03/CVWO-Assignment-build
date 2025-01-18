@@ -30,7 +30,7 @@ func GetDB() (*Database, error) {
 	conn.RawQuery = "sslmode=verify-ca;sslrootcert=ca.pem"
 
 	db, err := sql.Open("postgres", conn.String())
-	
+
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func createTables (db *sql.DB) {
 	// if err != nil {
 	// 	panic(err)
 	// }
-	// _, err := db.Exec("DELETE FROM Posts")
+	// _, _ = db.Exec("DELETE FROM Posts WHERE ID = 70")
 	// _, err = db.Exec("DELETE FROM Comments")
 	// _,err = db.Exec("INSERT INTO Comments (author,post,content,time) VALUES (24,49, 'Good job good one',1000)")
 
