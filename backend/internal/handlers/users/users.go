@@ -8,6 +8,7 @@ import (
 	"github.com/shriniket03/CRUD/backend/internal/database"
 	"github.com/shriniket03/CRUD/backend/internal/models"
 	"errors"
+	"strings"
 )
 
 const (
@@ -19,6 +20,7 @@ const (
 	NotUniqueUsername = "Username Already Exists"
 	SuccessfulSignInMessage = "Successful Sign-In"
 	ErrRetrieveUsersMsg = "Error retrieving User data from DB"
+	VerifiedToken = "Token is Valid"
 )
 
 func HandleList(w http.ResponseWriter, r *http.Request) (*api.Response, error) {
@@ -68,7 +70,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) (*api.Response, error) {
 
 	tokenstr, msg := users.LoginAction(db,inp)
 
-	data, err := json.Marshal(tokenstr)
+	data, err := json.Marshal(models.UserToken{Username:inp.Username, Token: tokenstr})
 
 	if tokenstr == "" {
 		return nil, msg
@@ -119,3 +121,28 @@ func AddUser(w http.ResponseWriter, r *http.Request) (*api.Response, error) {
 	}, nil
 }
 
+func VerifyToken (w http.ResponseWriter, r *http.Request) (*api.Response, error) {
+	reqToken := r.Header.Get("Authorization")
+	splitToken := strings.Split(reqToken, "Bearer ")
+
+	if len(splitToken) != 2 {
+		return nil, errors.New(`Unauthorized`)
+	}
+	
+	reqToken = splitToken[1]
+
+	_ , err := verifyToken(reqToken)
+
+	if err != nil {
+		return nil, errors.New(`Unauthorized`)
+	}
+
+	data, _ := json.Marshal("")
+
+	return &api.Response{
+		Payload: api.Payload{
+			Data: data,
+		},
+		Messages: []string{VerifiedToken},
+	}, nil
+}
