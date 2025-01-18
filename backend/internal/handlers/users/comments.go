@@ -25,7 +25,7 @@ func GetAllComments(w http.ResponseWriter, r *http.Request) (*api.Response, erro
 	if err != nil {
 		return nil, errors.New(ErrRetrieveDatabaseMsg)
 	}
-
+	
 	posts, err := users.GetComments(db)
 	if err != nil {
 		return nil, errors.New(ErrRetrievePostsMsg)

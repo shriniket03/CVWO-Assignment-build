@@ -34,7 +34,7 @@ func HandleList(w http.ResponseWriter, r *http.Request) (*api.Response, error) {
 	if err != nil {
 		return nil, errors.New(ErrRetrieveUsersMsg)
 	}
-
+	
 	data, err := json.Marshal(users)
 	if err != nil {
 		return nil, errors.New(ErrEncodeViewMsg)

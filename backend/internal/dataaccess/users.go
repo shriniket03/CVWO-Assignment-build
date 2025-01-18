@@ -29,6 +29,7 @@ func GetUsers(db *database.Database) ([]models.User, error) {
 
 		users = append(users,models.User{ID:int(a),Name:b,Username:c,Password:d})
 	}
+	app.Close()
 
 	return users, nil
 }
@@ -48,6 +49,7 @@ func AddUser(db *database.Database, details models.UserInput) (models.User, erro
 	if err != nil {
 		return models.User{}, err
 	}
+	app.Close()
 
 	return models.User{ID: lastInsertId, Username: details.Username, Password: hashText, Name:details.Name}, nil
 }
@@ -82,6 +84,7 @@ func LoginAction (db *database.Database, params models.Login) (string, error) {
     if err != nil {
 		return "", errors.New("unable to generate token")
     }
+	app.Close()
 
 	return tokenString, nil
 }

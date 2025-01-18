@@ -30,6 +30,7 @@ func InsertPost (db *database.Database, details models.PostInput, userID int) (m
 	if err != nil {
 		return models.PostInfo{}, errors.New(`Unable to get Post Info`)
 	}
+	app.Close()
 
 	return models.PostInfo{ID: int(id), AuthName: name, AuthUsername:username, Likes:likes, Tag:tag,Content:content,Time:times}, nil
 }
@@ -55,6 +56,7 @@ func GetPosts(db *database.Database) ([]models.PostInfo, error) {
 
 		posts = append(posts,models.PostInfo{ID:int(id),AuthName:name,AuthUsername:username,Likes:likes,Tag:tag,Content:content,Time:time})
 	}
+	app.Close()
 
 	return posts, nil
 }
@@ -71,6 +73,7 @@ func GetSinglePost(db *database.Database, inp int) (models.PostInfo, error) {
 	if err != nil {
 		return models.PostInfo{}, err
 	}
+	app.Close()
 
 	return models.PostInfo{ID: int(id), AuthName: name, AuthUsername:username, Likes:likes, Tag:tag,Content:content,Time:time}, nil
 }
@@ -92,6 +95,7 @@ func PostDeleter(db *database.Database, inp int, userID int) (string, error) {
 	if err!= nil {
 		return "", errors.New(`Unable to delete post`)
 	}
+	app.Close()
 
 	return "",nil
 }
@@ -119,6 +123,8 @@ func ModifyPostLikes (db *database.Database, inp int) (models.PostInfo, error) {
 	if err != nil {
 		return models.PostInfo{}, errors.New(`Unable to get Post Info`)
 	}
+	app.Close()
+
 	return models.PostInfo{ID: int(id), AuthName: name, AuthUsername:username, Likes:likes, Tag:tag,Content:content,Time:time}, nil
 }
 
@@ -154,6 +160,7 @@ func PostUpdater (db *database.Database, details models.PostInput, inp int, user
 	if err != nil {
 		return models.PostInfo{}, errors.New(`Unable to get Post Info`)
 	}
+	app.Close()
 
 	return models.PostInfo{ID: int(id), AuthName: name, AuthUsername:username, Likes:likes, Tag:tag,Content:content,Time:time}, nil
 }

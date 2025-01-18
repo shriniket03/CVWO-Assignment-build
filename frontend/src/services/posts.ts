@@ -1,11 +1,9 @@
 import { Post, PostInput } from "../types/Post";
 import axios, { AxiosError, isAxiosError } from "axios";
 
-const baseUrl = "http://localhost:8000";
-
 const getAll = async (): Promise<Post[]> => {
     try {
-        const request = await axios.get(`${baseUrl}/api/posts`);
+        const request = await axios.get(`/api/posts`);
         const output = await request.data.payload.data;
         return output;
     } catch (e) {
@@ -15,7 +13,7 @@ const getAll = async (): Promise<Post[]> => {
 
 const createPost = async (input: PostInput, auth: string): Promise<Post> => {
     try {
-        const request = await axios.post(`${baseUrl}/api/posts`, input, createHeader(auth));
+        const request = await axios.post(`/api/posts`, input, createHeader(auth));
         const output = await request.data.payload.data;
         return output;
     } catch (e) {
@@ -25,7 +23,7 @@ const createPost = async (input: PostInput, auth: string): Promise<Post> => {
 
 const getPost = async (id: number): Promise<Post> => {
     try {
-        const request = await axios.get(`${baseUrl}/api/posts/${id}`);
+        const request = await axios.get(`/api/posts/${id}`);
         const output = await request.data.payload.data;
         return output;
     } catch (e) {
@@ -35,7 +33,7 @@ const getPost = async (id: number): Promise<Post> => {
 
 const deletePost = async (id: number, auth: string): Promise<string> => {
     try {
-        await axios.delete(`${baseUrl}/api/posts/${id}`, createHeader(auth));
+        await axios.delete(`/api/posts/${id}`, createHeader(auth));
         return "Success";
     } catch (e) {
         throw errorHandler(e as Error);
@@ -44,7 +42,7 @@ const deletePost = async (id: number, auth: string): Promise<string> => {
 
 const likePost = async (id: number, auth: string): Promise<Post> => {
     try {
-        const request = await axios.patch(`${baseUrl}/api/likepost/${id}`, [], createHeader(auth));
+        const request = await axios.patch(`/api/likepost/${id}`, [], createHeader(auth));
         const output = await request.data.payload.data;
         return output;
     } catch (e) {
@@ -54,7 +52,7 @@ const likePost = async (id: number, auth: string): Promise<Post> => {
 
 const modifyPost = async (id: number, auth: string, input: PostInput): Promise<Post> => {
     try {
-        const request = await axios.patch(`${baseUrl}/api/posts/${id}`, input, createHeader(auth));
+        const request = await axios.patch(`/api/posts/${id}`, input, createHeader(auth));
         const output = await request.data.payload.data;
         return output;
     } catch (e) {

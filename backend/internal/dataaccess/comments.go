@@ -28,6 +28,7 @@ func GetComments(db *database.Database) ([]models.Comment, error) {
 
 		comments = append(comments,models.Comment{ID:int(id),AuthName:name,AuthUsername:username,Post:post,Content:content, Time: time})
 	}
+	app.Close()
 
 	return comments, nil
 }
@@ -49,6 +50,7 @@ func AddComment(db *database.Database, details models.CommentInput, userID int) 
 	if err != nil {
 		return models.Comment{}, err
 	}
+	app.Close()
 
 	return models.Comment{ID: lastInsertId, AuthName: name, AuthUsername: username, Post:post, Content:content, Time: times}, nil
 }
@@ -65,6 +67,7 @@ func GetComment(db *database.Database, inp int) (models.Comment, error) {
 	if err != nil {
 		return models.Comment{}, err
 	}
+	app.Close()
 
 	return models.Comment{ID: inp, AuthName: name, AuthUsername: username, Post:post, Content:content, Time: time}, nil
 }
@@ -88,6 +91,7 @@ func CommentDeleter(db *database.Database, inp int, userID int) (string, error) 
 	if err!= nil {
 		return "", errors.New(`Error deleting comment from DB`)
 	}
+	app.Close()
 
 	return "",nil
 }

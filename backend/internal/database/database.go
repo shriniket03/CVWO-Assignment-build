@@ -30,7 +30,7 @@ func GetDB() (*Database, error) {
 	conn.RawQuery = "sslmode=verify-ca;sslrootcert=ca.pem"
 
 	db, err := sql.Open("postgres", conn.String())
-
+	
 	if err != nil {
 		return nil, err
 	}

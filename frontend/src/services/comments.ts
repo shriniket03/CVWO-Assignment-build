@@ -2,11 +2,9 @@ import { errorHandler } from "./posts";
 import { Comment, CommentInput } from "../types/Comments";
 import axios from "axios";
 
-const baseUrl = "http://localhost:8000";
-
 const getAll = async (): Promise<Comment[]> => {
     try {
-        const request = await axios.get(`${baseUrl}/api/comments`);
+        const request = await axios.get(`/api/comments`);
         const output = await request.data.payload.data;
         return output;
     } catch (e) {
@@ -16,7 +14,7 @@ const getAll = async (): Promise<Comment[]> => {
 
 const deleteComment = async (id: number, auth: string): Promise<string> => {
     try {
-        await axios.delete(`${baseUrl}/api/comments/${id}`, createHeader(auth));
+        await axios.delete(`/api/comments/${id}`, createHeader(auth));
         return "Success";
     } catch (e) {
         throw errorHandler(e as Error);
@@ -25,7 +23,7 @@ const deleteComment = async (id: number, auth: string): Promise<string> => {
 
 const createComment = async (input: CommentInput, auth: string): Promise<Comment> => {
     try {
-        const comment = await axios.post(`${baseUrl}/api/comments`, input, createHeader(auth));
+        const comment = await axios.post(`/api/comments`, input, createHeader(auth));
         const output = await comment.data.payload.data;
         return output;
     } catch (e) {
