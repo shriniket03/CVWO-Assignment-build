@@ -23,6 +23,7 @@ type Database struct {
 
 func GetDB() (*Database, error) {
 	psqlInfo := os.Getenv("DATABASE_URI")
+	fmt.Println(psqlInfo)
 	conn, _ := url.Parse(psqlInfo)
 	conn.RawQuery = "sslmode=verify-ca;sslrootcert=ca.pem"
 
