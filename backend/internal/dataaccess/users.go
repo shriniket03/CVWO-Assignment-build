@@ -7,6 +7,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	 "time"
 	 "errors"
+	 "os"
 )
 
 func GetUsers(db *database.Database) ([]models.User, error) {
