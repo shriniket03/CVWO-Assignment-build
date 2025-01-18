@@ -14,7 +14,6 @@ import (
 	"strconv"
 	"errors"
 	"time"
-	"os"
 )
 
 const (
@@ -268,7 +267,7 @@ func UpdatePost(w http.ResponseWriter, r*http.Request, txt string) (*api.Respons
 
 func verifyToken(tokenString string) (int,error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-	   return []byte(os.Getenv("SECRET")), nil
+	   return []byte(database.GoDotEnvVariable("SECRET")), nil
 	})
 
 	if err != nil {

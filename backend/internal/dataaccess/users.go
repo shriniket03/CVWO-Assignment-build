@@ -7,7 +7,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	 "time"
 	 "errors"
-	 "os"
 )
 
 func GetUsers(db *database.Database) ([]models.User, error) {
@@ -79,7 +78,7 @@ func LoginAction (db *database.Database, params models.Login) (string, error) {
 		"exp": time.Now().Add(time.Hour * 1).Unix(), 
         })
 
-	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
+	tokenString, err := token.SignedString([]byte(database.GoDotEnvVariable("SECRET")))
     if err != nil {
 		return "", errors.New("unable to generate token")
     }
