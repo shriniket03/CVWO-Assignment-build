@@ -2,7 +2,7 @@ import Dialog from "./Dialog";
 import CreatePost from "../pages/CreatePost";
 import { type Post } from "../types/Post";
 import { addPostLike } from "../store";
-import { useAppSelector, useAppDispatch } from "../hooks";
+import { useAppSelector, useAppDispatch, useWindowDimensions } from "../hooks";
 import React from "react";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -19,6 +19,8 @@ const EditTray: React.FC<Props> = ({ owner, postID }: Props) => {
     const posts = useAppSelector((state) => state.posts);
     const [selectedID, setSelectedID] = React.useState(0);
     const [selectedModalID, setSelectedModalID] = React.useState(0);
+    const { width } = useWindowDimensions();
+
     const dispatch = useAppDispatch();
     const handleThumbUp = () => {
         dispatch(addPostLike(postID, token.Token));
@@ -34,6 +36,15 @@ const EditTray: React.FC<Props> = ({ owner, postID }: Props) => {
         setSelectedModalID(postID);
     };
 
+    const modalStyle = {
+        theme: { color: "#fff" },
+        height: "70vh + 10vw",
+        position: "absolute",
+        left: "50%",
+        top: "10%",
+        overflow: "scroll",
+    };
+
     if (owner === 2) {
         return (
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10 }}>
@@ -41,16 +52,11 @@ const EditTray: React.FC<Props> = ({ owner, postID }: Props) => {
                 <Modal
                     open={openModal}
                     onClose={() => setOpenModal(false)}
-                    sx={{
-                        theme: { color: "#fff" },
-                        width: "900px",
-                        height: "700px",
-                        position: "absolute",
-                        left: "50%",
-                        top: "10%",
-                        marginLeft: "-450px",
-                        marginRight: "-450px",
-                    }}
+                    sx={
+                        width < 900
+                            ? { ...modalStyle, width: "96vw", marginLeft: "-48vw", marginRight: "-48vw" }
+                            : { ...modalStyle, width: "46vw", marginLeft: "-23vw", marginRight: "-23vw" }
+                    }
                 >
                     <Box>
                         <CreatePost
