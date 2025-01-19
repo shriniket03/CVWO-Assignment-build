@@ -3,7 +3,7 @@ import PostUI from "./PostUI";
 import CreatePost from "../pages/CreatePost";
 import { type Post } from "../types/Post";
 import { sortPostsLikes, sortPostDate } from "../store";
-import { useAppDispatch, useAppSelector } from "../hooks";
+import { useAppDispatch, useAppSelector, useWindowDimensions } from "../hooks";
 import { List, Fab, Modal, Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import React from "react";
@@ -15,6 +15,8 @@ const BasicThreadList: React.FC = () => {
     const posts = useAppSelector((state) => state.posts);
     const token = useAppSelector((state) => state.token);
     const search = useAppSelector((state) => state.filter);
+    const { width } = useWindowDimensions();
+
     const [open, setOpen] = React.useState(false);
     const handleClose = () => setOpen(false);
     const handleOpen = () => setOpen(true);
@@ -28,6 +30,16 @@ const BasicThreadList: React.FC = () => {
             dispatch(sortPostsLikes());
         }
     };
+
+    const modalStyle = {
+        theme: { color: "#fff" },
+        height: "70vh + 10vw",
+        position: "absolute",
+        left: "50%",
+        top: "10%",
+        overflow: "scroll",
+    };
+
     return (
         <div>
             <FormControl style={{ marginRight: 20, float: "right", width: 120 }}>
@@ -52,16 +64,11 @@ const BasicThreadList: React.FC = () => {
                 <Modal
                     open={open}
                     onClose={handleClose}
-                    sx={{
-                        theme: { color: "#fff" },
-                        width: "900px",
-                        height: "700px",
-                        position: "absolute",
-                        left: "50%",
-                        top: "10%",
-                        marginLeft: "-450px",
-                        marginRight: "-450px",
-                    }}
+                    sx={
+                        width < 900
+                            ? { ...modalStyle, width: "96vw", marginLeft: "-48vw", marginRight: "-48vw" }
+                            : { ...modalStyle, width: "46vw", marginLeft: "-23vw", marginRight: "-23vw" }
+                    }
                 >
                     <Box>
                         <CreatePost handleClose={handleClose} post={{} as Post} />

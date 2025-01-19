@@ -27,7 +27,7 @@ const PostDetails: React.FC = () => {
             <Menu page={1} />
             <Notification />
             <PostView post={Post} />
-            <Card sx={{ textAlign: "left" }}>
+            <Card sx={{ textAlign: "left", marginBottom: 3 }}>
                 <Box sx={{ marginLeft: 3 }}>
                     <h2>Comments</h2>
                     <List>
@@ -38,6 +38,7 @@ const PostDetails: React.FC = () => {
                                 <CommentsUI {...comment} key={comment.ID} />
                             ))}
                     </List>
+                    <br></br>
                     <CommentsForm Post={Post} />
                 </Box>
             </Card>

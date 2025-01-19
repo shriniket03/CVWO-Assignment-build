@@ -32,7 +32,7 @@ const PostUI: React.FC<Post> = (props: Post) => {
                             }`}
                         </React.Fragment>
                     }
-                    sx={{ width: 500, marginRight: 10, textAlign: "justify" }}
+                    sx={{ width: 500, marginRight: "5vw", textAlign: "justify" }}
                 />
                 <div style={{ marginRight: 10, margin: 5, width: 120 }}>
                     {props.Likes} likes <br></br>

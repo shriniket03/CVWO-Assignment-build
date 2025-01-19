@@ -46,9 +46,9 @@ const CommentsForm: React.FC<Props> = ({ Post }: Props) => {
     return (
         <div>
             {token.Valid ? (
-                <FormControl sx={{ width: "95%", margin: 2 }}>
+                <FormControl sx={{ width: "95%" }}>
                     <TextFieldWrapper
-                        label="Add Comment"
+                        label="   Add Comment"
                         value={comment}
                         onChange={handleCommentChange}
                         error={commentValid != ""}
@@ -70,6 +70,9 @@ const CommentsForm: React.FC<Props> = ({ Post }: Props) => {
 export const TextFieldWrapper = styled(TextField)`
     fieldset {
         border-radius: 30px;
+    }
+    "& fieldset>legend": {
+        fontsize: "5em";
     }
 `;
 

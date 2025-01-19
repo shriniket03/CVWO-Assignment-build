@@ -1,7 +1,7 @@
 import postService from "../services/posts";
 import { type Post } from "../types/Post";
 import { setSuccessMessage, addPost, modifyPost } from "../store";
-import { useAppSelector, useAppDispatch } from "../hooks";
+import { useAppSelector, useAppDispatch, useWindowDimensions } from "../hooks";
 import { Box, FormControl, TextField, Button } from "@mui/material";
 import React from "react";
 
@@ -15,6 +15,8 @@ const CreatePost: React.FC<Props> = ({ handleClose, post }: Props) => {
     const [tagValid, setTagValid] = React.useState("");
     const [content, setContent] = React.useState(post.Content || "");
     const [contentValid, setContentValid] = React.useState("");
+
+    const { width } = useWindowDimensions();
 
     const token = useAppSelector((state) => state.token);
     const dispatch = useAppDispatch();
@@ -62,18 +64,15 @@ const CreatePost: React.FC<Props> = ({ handleClose, post }: Props) => {
             }
         }
     };
-
+    const boxStyle = {
+        backgroundColor: "white",
+        padding: "3vw",
+        textAlign: "center",
+        height: "70vh",
+        overflow: "scroll",
+    };
     return (
-        <Box
-            style={{
-                backgroundColor: "white",
-                padding: 50,
-                textAlign: "center",
-                width: "800px",
-                height: "600px",
-                overflow: "scroll",
-            }}
-        >
+        <Box sx={width < 900 ? { ...boxStyle, width: "90vw" } : { ...boxStyle, width: "40vw" }}>
             {post.ID ? <h2>Edit Post</h2> : <h2>Create Post</h2>}
             <br></br>
             <FormControl sx={{ width: 1 }}>
@@ -90,14 +89,13 @@ const CreatePost: React.FC<Props> = ({ handleClose, post }: Props) => {
                 <TextField
                     id="content"
                     label="Content"
-                    variant="outlined"
-                    sx={{ marginBottom: 4 }}
+                    sx={{ marginBottom: 4, backgroundColor: "white" }}
                     value={content}
                     onChange={handleContentChange}
                     error={contentValid !== ""}
                     helperText={contentValid}
                     multiline
-                    minRows={15}
+                    rows={15}
                 />
                 <Button variant="contained" onClick={handleCreatePost}>
                     {post.ID ? `Edit Post` : `Create Post`}

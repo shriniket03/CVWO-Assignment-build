@@ -24,8 +24,8 @@ func Setup() chi.Router {
 	//   }))
 	setUpRoutes(r)
 	workDir, _ := os.Getwd()
-	filesDir := http.Dir(filepath.Join(workDir, "../../build"))
-	// filesDir := http.Dir(filepath.Join(workDir, "./build"))
+	// filesDir := http.Dir(filepath.Join(workDir, "../../build"))
+	filesDir := http.Dir(filepath.Join(workDir, "./build"))
 	FileServer(r, "/", filesDir)
 	return r
 }
