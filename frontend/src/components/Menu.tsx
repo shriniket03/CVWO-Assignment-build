@@ -15,7 +15,7 @@ const Menu: React.FC<Props> = ({ page }: Props) => {
     const [open, setOpen] = React.useState(false);
     const [selected, setSelected] = React.useState(true);
 
-    const search = useAppSelector((state) => state.filter);
+    const search = useAppSelector((state) => state.filter.search);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 

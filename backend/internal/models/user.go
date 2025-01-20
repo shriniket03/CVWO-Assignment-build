@@ -31,6 +31,7 @@ type Login struct {
 type PostInput struct {
 	Tag string 
 	Content string
+	Category string
 }
 
 type Post struct {
@@ -50,6 +51,7 @@ type PostInfo struct {
 	Tag string
 	Content string
 	Time int 
+	Category string
 }
 
 type Comment struct {
@@ -78,6 +80,7 @@ func (u PostInput) Validate() error {
 	return validation.ValidateStruct(&u,
 		validation.Field(&u.Tag, validation.Required, validation.Length(5, 0)),
 		validation.Field(&u.Content, validation.Required, validation.Length(5, 0)),
+		validation.Field(&u.Category, validation.Required, validation.Length(5, 50)),
 	)
 }
 

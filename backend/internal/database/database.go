@@ -11,7 +11,6 @@ import (
 )
 
 func GoDotEnvVariable(key string) string {
-	// load .env file
 	err := godotenv.Load("/etc/secrets/.env")
 	// err := godotenv.Load(".env")
 	if err != nil {
@@ -40,47 +39,8 @@ func GetDB() (*Database, error) {
   		return nil, err
 	}
 	fmt.Println("Successfully connected!")
+	if err != nil {
+		panic(err)
+	}
 	return &Database{Ref:db}, nil
-}
-
-func createTables (db *sql.DB) {
-	// query := `CREATE TABLE IF NOT EXISTS Comments (
-	// id SERIAL PRIMARY KEY,
-	// author INT, 
-	// post INT, 
-	// content TEXT NOT NULL, 
-	// CONSTRAINT fk_Author FOREIGN KEY(author) REFERENCES Users(id),
-	// CONSTRAINT fk_Post FOREIGN KEY(post) REFERENCES Posts(id)
-	// )`
-	// query := `ALTER TABLE Posts
-	// ADD time bigint`
-	// _, err:= db.Exec(query)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// _, _ = db.Exec("DELETE FROM Posts WHERE ID = 70")
-	// _, err = db.Exec("DELETE FROM Comments")
-	// _,err = db.Exec("INSERT INTO Comments (author,post,content,time) VALUES (24,49, 'Good job good one',1000)")
-
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// rows, err := db.Query("SELECT * FROM Comments")
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// for rows.Next() {
-	// 	var id, auth, post,time int
-	// 	var content string
-	// 	err = rows.Scan(&id, &auth, &post, &content, &time)
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-
-	// 	fmt.Println(id,auth,post,content,time)
-	// }
-
-
 }

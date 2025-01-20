@@ -1,6 +1,7 @@
 import EditTray from "./EditTray";
 import { type Post } from "../types/Post";
 import { useAppSelector } from "../hooks";
+import tinycolor from "tinycolor2";
 import React from "react";
 import { Box, Divider, ListItem, ListItemAvatar, ListItemText, Avatar, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
@@ -20,6 +21,23 @@ const PostUI: React.FC<Post> = (props: Post) => {
                     primary={<Link to={`/post/${props.ID}`}>{props.Tag}</Link>}
                     secondary={
                         <React.Fragment>
+                            <Box
+                                sx={{
+                                    borderRadius: 5,
+                                    backgroundColor: stringToColor(props.Category.toUpperCase()),
+                                    color: tinycolor(stringToColor(props.Category.toUpperCase())).isLight()
+                                        ? "black"
+                                        : "white",
+                                    width: "fit-content",
+                                    paddingLeft: 2,
+                                    paddingRight: 2,
+                                    textAlign: "center",
+                                    marginTop: 1,
+                                    marginBottom: 1,
+                                }}
+                            >
+                                <Typography>{props.Category}</Typography>
+                            </Box>
                             <Typography
                                 component="span"
                                 variant="body2"

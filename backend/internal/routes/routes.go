@@ -163,7 +163,6 @@ func GetRoutes() func(r chi.Router) {
 		})
 
 		r.Delete("/api/comments/{id}", func(w http.ResponseWriter, req *http.Request) {
-			// Delete
 			response, err := users.DeleteComment(w,req,chi.URLParam(req, "id"))
 			if err != nil {
 				if err.Error() == `Unauthorized` {

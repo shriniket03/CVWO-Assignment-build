@@ -9,7 +9,7 @@ import postReducer, {
 } from "./reducers/postReducer";
 import notifReducer, { setNotification, closeNotification } from "./reducers/notifReducer";
 import tokenReducer, { setToken, setValidToken, removeToken } from "./reducers/tokenReducer";
-import filterReducer, { setFilter } from "./reducers/filterReducer";
+import filterReducer, { setSearch, setCategory } from "./reducers/filterReducer";
 import commentsReducer, { setComments, appendComment, removeComment } from "./reducers/commentsReducer";
 
 import {
@@ -95,7 +95,13 @@ export const modifyPost = (amended: Post) => {
 
 export const modifyFilter = (search: string) => {
     return async (dispatch: Dispatch<FilterPostAction>) => {
-        dispatch(setFilter(search));
+        dispatch(setSearch(search));
+    };
+};
+
+export const modifyCategoryFilter = (search: string) => {
+    return async (dispatch: Dispatch<FilterPostAction>) => {
+        dispatch(setCategory(search));
     };
 };
 

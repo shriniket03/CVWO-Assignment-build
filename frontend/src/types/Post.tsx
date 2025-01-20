@@ -6,9 +6,16 @@ export interface Post {
     Tag: string;
     Content: string;
     Time: number;
+    Category: string;
 }
 
 export interface PostInput {
     tag: string;
     content: string;
+    category: string;
+}
+
+export interface PostFilter {
+    search: string;
+    category: string;
 }

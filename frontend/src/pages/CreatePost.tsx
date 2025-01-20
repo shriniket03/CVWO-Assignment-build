@@ -2,7 +2,8 @@ import postService from "../services/posts";
 import { type Post } from "../types/Post";
 import { setSuccessMessage, addPost, modifyPost } from "../store";
 import { useAppSelector, useAppDispatch, useWindowDimensions } from "../hooks";
-import { Box, FormControl, TextField, Button } from "@mui/material";
+import { Box, FormControl, TextField, Button, Autocomplete } from "@mui/material";
+
 import React from "react";
 
 type Props = {
@@ -15,10 +16,14 @@ const CreatePost: React.FC<Props> = ({ handleClose, post }: Props) => {
     const [tagValid, setTagValid] = React.useState("");
     const [content, setContent] = React.useState(post.Content || "");
     const [contentValid, setContentValid] = React.useState("");
+    const [category, setCategory] = React.useState(post.Category || "");
+    const [categoryValid, setCategoryValid] = React.useState("");
 
     const { width } = useWindowDimensions();
 
     const token = useAppSelector((state) => state.token);
+    const posts = useAppSelector((state) => state.posts);
+
     const dispatch = useAppDispatch();
 
     const handleTagChange = (event: React.ChangeEvent) => {
@@ -37,12 +42,12 @@ const CreatePost: React.FC<Props> = ({ handleClose, post }: Props) => {
         event.preventDefault();
         try {
             if (post.ID) {
-                const res = await postService.modifyPost(post.ID, token.Token, { tag, content });
+                const res = await postService.modifyPost(post.ID, token.Token, { tag, content, category });
                 await dispatch(modifyPost(res));
                 await dispatch(setSuccessMessage(`Success! You have edited your existing post with tag ${res.Tag}`));
                 handleClose();
             } else {
-                const res = await postService.createPost({ tag, content }, token.Token);
+                const res = await postService.createPost({ tag, content, category }, token.Token);
                 await dispatch(setSuccessMessage(`Success! You have created a post with tag ${res.Tag}`));
                 await dispatch(addPost(res));
                 handleClose();
@@ -56,7 +61,10 @@ const CreatePost: React.FC<Props> = ({ handleClose, post }: Props) => {
                 if (obj.Content) {
                     setContentValid(obj.Content);
                 }
-                if (!(obj.Tag || obj.Content)) {
+                if (obj.Category) {
+                    setCategoryValid(obj.Category);
+                }
+                if (!(obj.Tag || obj.Content || obj.Category)) {
                     setTagValid((err as Error).message);
                 }
             } catch (e) {
@@ -85,6 +93,32 @@ const CreatePost: React.FC<Props> = ({ handleClose, post }: Props) => {
                     onChange={handleTagChange}
                     error={tagValid !== ""}
                     helperText={tagValid}
+                />
+                <Autocomplete
+                    id="category"
+                    freeSolo
+                    value={category}
+                    sx={{ marginBottom: 2 }}
+                    onChange={(event, newValue) => {
+                        setCategory(newValue || "");
+                        setCategoryValid("");
+                    }}
+                    options={posts
+                        .map((post) => post.Category)
+                        .filter((value, index, array) => array.indexOf(value) === index)}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            label="Category"
+                            error={categoryValid != ""}
+                            helperText={categoryValid}
+                            onChange={(event: React.ChangeEvent) => {
+                                event.preventDefault();
+                                setCategory((event.target as HTMLInputElement).value);
+                                setCategoryValid("");
+                            }}
+                        />
+                    )}
                 />
                 <TextField
                     id="content"

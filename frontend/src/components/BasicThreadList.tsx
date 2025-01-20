@@ -2,9 +2,20 @@ import "../App.css";
 import PostUI from "./PostUI";
 import CreatePost from "../pages/CreatePost";
 import { type Post } from "../types/Post";
-import { sortPostsLikes, sortPostDate } from "../store";
+import { sortPostsLikes, sortPostDate, modifyCategoryFilter } from "../store";
 import { useAppDispatch, useAppSelector, useWindowDimensions } from "../hooks";
-import { List, Fab, Modal, Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import {
+    List,
+    Fab,
+    Modal,
+    Box,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    Autocomplete,
+    TextField,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import React from "react";
 
@@ -18,6 +29,8 @@ const BasicThreadList: React.FC = () => {
     const { width } = useWindowDimensions();
 
     const [open, setOpen] = React.useState(false);
+    const [filterCat, setFilterCat] = React.useState("");
+
     const handleClose = () => setOpen(false);
     const handleOpen = () => setOpen(true);
 
@@ -42,21 +55,54 @@ const BasicThreadList: React.FC = () => {
 
     return (
         <div>
-            <FormControl style={{ marginRight: 20, float: "right", width: 120 }}>
-                <InputLabel id="selectLabel">Sort By</InputLabel>
-                <Select labelId="selectorLabel" id="selectField" value={sort} label="Sort By" onChange={handleChange}>
-                    <MenuItem value={"1"}>Likes</MenuItem>
-                    <MenuItem value={"0"}>Newest</MenuItem>
-                </Select>
-            </FormControl>
+            <Box style={{ marginLeft: 20, float: "left", display: "flex", gap: "1rem" }}>
+                <Autocomplete
+                    options={posts
+                        .map((post) => post.Category)
+                        .filter((value, index, array) => array.indexOf(value) === index)}
+                    value={filterCat}
+                    onChange={(event, newValue) => {
+                        setFilterCat(newValue || "");
+                        dispatch(modifyCategoryFilter(newValue || ""));
+                    }}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            onChange={(event: React.ChangeEvent) => {
+                                event.preventDefault();
+                                setFilterCat((event.target as HTMLInputElement).value);
+                                dispatch(modifyCategoryFilter((event.target as HTMLInputElement).value));
+                            }}
+                            sx={{ width: "15vw" }}
+                            label="Sort By Category"
+                        />
+                    )}
+                />
+                <FormControl>
+                    <InputLabel id="selectLabel">Sort By</InputLabel>
+                    <Select
+                        labelId="selectorLabel"
+                        id="selectField"
+                        value={sort}
+                        label="Sort By"
+                        onChange={handleChange}
+                    >
+                        <MenuItem value={"1"}>Likes</MenuItem>
+                        <MenuItem value={"0"}>Newest</MenuItem>
+                    </Select>
+                </FormControl>
+            </Box>
             <div style={{ width: "100vw", margin: "auto", textAlign: "center", overflowY: "auto" }}>
+                <br></br>
                 <List>
                     {posts
                         .filter(
                             (post) =>
-                                post.Tag.toLowerCase().includes(search.toLowerCase()) ||
-                                post.Content.toLowerCase().includes(search.toLowerCase()),
+                                post.Tag.toLowerCase().includes(search.search.toLowerCase()) ||
+                                post.Content.toLowerCase().includes(search.search.toLowerCase()) ||
+                                post.Category.toLowerCase().includes(search.search.toLowerCase()),
                         )
+                        .filter((post) => post.Category === search.category || search.category === "")
                         .map((post: Post) => (
                             <PostUI {...post} key={post.ID} />
                         ))}
