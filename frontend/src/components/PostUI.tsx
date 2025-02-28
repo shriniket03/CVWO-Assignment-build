@@ -36,7 +36,7 @@ const PostUI: React.FC<Post> = (props: Post) => {
                                     marginBottom: 1,
                                 }}
                             >
-                                <Typography>{props.Category}</Typography>
+                                <Typography component="span">{props.Category}</Typography>
                             </Box>
                             <Typography
                                 component="span"

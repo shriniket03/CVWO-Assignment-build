@@ -23,7 +23,7 @@ const LoggedIn: React.FC<Props> = ({ setOpen, setSelected }: Props) => {
                 .then(() => dispatch(validateToken(true)))
                 .catch(() => dispatch(validateToken(false)));
         }
-    }, [validateToken, token]);
+    }, []);
     if (token.Valid) {
         return (
             <em>
