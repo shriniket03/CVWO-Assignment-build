@@ -17,6 +17,7 @@ const LoggedIn: React.FC<Props> = ({ setOpen, setSelected }: Props) => {
         setOpen(true);
         setSelected(false);
     };
+
     React.useEffect(() => {
         if (token.Token != "") {
             verifyToken(token.Token)
@@ -24,6 +25,7 @@ const LoggedIn: React.FC<Props> = ({ setOpen, setSelected }: Props) => {
                 .catch(() => dispatch(validateToken(false)));
         }
     }, []);
+
     if (token.Valid) {
         return (
             <em>
